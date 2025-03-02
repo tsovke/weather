@@ -8,6 +8,12 @@
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QMessageBox>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+
+#include "weatherdata.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,6 +38,8 @@ protected:
     //获取天气数据
     void getWeatherInfo(QString cityCode);
 
+    void parseJson(QByteArray &responseData);
+
 private:
     void onReplied(QNetworkReply *reply);
 
@@ -44,5 +52,8 @@ private:
     QPoint mOffset;//窗口移动时，鼠标与左上角的偏移
 
     QNetworkAccessManager* mNetAccessManager;
+
+    Today mToday;
+    Day mDay[6];
 };
 #endif // MAINWINDOW_H

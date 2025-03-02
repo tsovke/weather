@@ -82,9 +82,14 @@ void MainWindow::getWeatherInfo(QString cityCode)
     mNetAccessManager->get(QNetworkRequest(url));
 }
 
+void MainWindow::parseJson(QByteArray &responseData)
+{
+
+}
+
 void MainWindow::onReplied(QNetworkReply *reply)
 {
-        if (reply->error() == QNetworkReply::NoError) {
+    if (reply->error() == QNetworkReply::NoError) {
         int status_code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         qDebug()<<"status code : "<<status_code;
         qDebug()<<"url : "<<reply->url();
@@ -101,6 +106,8 @@ void MainWindow::onReplied(QNetworkReply *reply)
         // 处理响应数据
         QByteArray responseData = reply->readAll();
         qDebug() << "Response data:" << responseData.data();
+        // 解析数据
+        parseJson(responseData);
     } else {
         qDebug() << "Error:" << reply->errorString().toLatin1().data();
         QMessageBox::warning(this,"天气","请求数据失败",QMessageBox::Ok);
@@ -108,3 +115,5 @@ void MainWindow::onReplied(QNetworkReply *reply)
 
     reply->deleteLater(); // 确保释放资源
 }
+
+
