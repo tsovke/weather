@@ -74,5 +74,7 @@ private:
     QList<QLabel*> mFxList;
     QList<QLabel*> mFlList;
 
+    QMap<QString,QString> mTypeMap;
+
 };
 #endif // MAINWINDOW_H
