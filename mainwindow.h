@@ -51,9 +51,28 @@ private:
     bool mDragging; //
     QPoint mOffset;//窗口移动时，鼠标与左上角的偏移
 
+
+    //http请求
     QNetworkAccessManager* mNetAccessManager;
 
+    //今天和6天的天气
     Today mToday;
     Day mDay[6];
+
+    //星期和日期
+    QList<QLabel*> mWeekList;
+    QList<QLabel*> mDateList;
+
+    //天气和天气图标
+    QList<QLabel*> mTypeList;
+    QList<QLabel*> mTypeIconList;
+
+    //空气污染指数
+    QList<QLabel*> mAqiList;
+
+    //风向和风力
+    QList<QLabel*> mFxList;
+    QList<QLabel*> mFlList;
+
 };
 #endif // MAINWINDOW_H

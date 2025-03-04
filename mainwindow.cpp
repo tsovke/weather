@@ -28,10 +28,32 @@ MainWindow::MainWindow(QWidget *parent)
         qApp->exit(0);
     });
 
+    //将控件添加的控件数组中
+    //星期和日期
+    mWeekList << ui->lblWeek0 << ui->lblWeek1 << ui->lblWeek2 << ui->lblWeek3 << ui->lblWeek4
+              << ui->lblWeek5;
+    mDateList << ui->lblDate0 << ui->lblDate2 << ui->lblDate2 << ui->lblDate3 << ui->lblDate4
+              << ui->lblDate5;
+    //天气和天气图标
+    mTypeList << ui->lblType0 << ui->lblType1 << ui->lblType2 << ui->lblType3 << ui->lblType4
+              << ui->lblType5;
+    mTypeIconList << ui->lblTypeIcon0 << ui->lblTypeIcon1 << ui->lblTypeIcon2 << ui->lblTypeIcon3 << ui->lblTypeIcon4
+              << ui->lblTypeIcon5;
+    //空气污染指数
+    mAqiList << ui->lblAqi0 << ui->lblAqi1 << ui->lblAqi2 << ui->lblAqi3 << ui->lblAqi4
+                  << ui->lblAqi5;
+    //风向和风力
+    mFxList << ui->lblFx0 << ui->lblFx1 << ui->lblFx2 << ui->lblFx3 << ui->lblFx4
+             << ui->lblFx5;
+    mFlList << ui->lblFl0 << ui->lblFl1 << ui->lblFl2 << ui->lblFl3 << ui->lblFl4
+             << ui->lblFl5;
+
     // mNetAccessManager=new QNetworkAccessManager(this);
     connect(mNetAccessManager,&QNetworkAccessManager::finished,this,&MainWindow::onReplied);
 
     getWeatherInfo("101010100");
+
+
 }
 
 MainWindow::~MainWindow()
@@ -77,6 +99,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 void MainWindow::getWeatherInfo(QString cityCode)
 {
     // QUrl url("http://t.weather.itboy.net/api/weather/city/"+cityCode);
+    qDebug()<<cityCode;
     QUrl url("https://www.ithome.com/");
 
     mNetAccessManager->get(QNetworkRequest(url));
@@ -97,9 +120,82 @@ void MainWindow::parseJson(QByteArray &responseData)
     mToday.date=rootObj.value("date").toString();
     mToday.city= rootObj.value("cityInfo").toObject().value("city").toString();
 
+    //2. 解析昨天的数据
+    QJsonObject objData=rootObj.value("data").toObject();
+    QJsonObject objYersterday=objData.value("yesterday").toObject();
 
+    mDay[0].week=objYersterday.value("week").toString();
+    mDay[0].date=objYersterday.value("ymd").toString();
+    mDay[0].type=objYersterday.value("type").toString();
+
+    QString s;
+    s=objYersterday.value("high").toString().split(" ").at(1);// 高温 18℃中的"18℃"
+    s=s.left(s.length()-1); //18
+    mDay[0].high=s.toInt();
+    QString t;
+    t=objYersterday.value("low").toString().split(" ").at(1);// 低温 10℃中的"10℃"
+    t=t.left(s.length()-1); //10
+    mDay[0].low=t.toInt();
+
+    mDay[0].fl=objYersterday.value("fl").toString();
+    mDay[0].fx=objYersterday.value("fx").toString();
+
+    //污染指数
+     mDay[0].aqi=objYersterday.value("aqi").toInt();
+
+    //3. 解析forecast中5天的数据
+     QJsonArray forecastArr=objData.value("forecast").toArray();
+
+     for (int i = 0; i < 5; ++i) {
+         QJsonObject objForecast=forecastArr[i].toObject();
+
+         mDay[i+1].week=objForecast.value("week").toString();
+         mDay[i+1].date=objForecast.value("ymd").toString();
+         mDay[i+1].type=objForecast.value("type").toString();
+
+         QString s;
+         s=objForecast.value("high").toString().split(" ").at(1);// 高温 18℃中的"18℃"
+         s=s.left(s.length()-1); //18
+         mDay[i+1].high=s.toInt();
+         QString t;
+         t=objForecast.value("low").toString().split(" ").at(1);// 低温 10℃中的"10℃"
+         t=t.left(s.length()-1); //10
+         mDay[i+1].low=t.toInt();
+
+         mDay[i+1].fl=objForecast.value("fl").toString();
+         mDay[i+1].fx=objForecast.value("fx").toString();
+
+         //污染指数
+         mDay[i+1].aqi=objForecast.value("aqi").toInt();
+     }
+
+    //4. 解析今天的数据
+     // ganmao="感冒指数";
+
+     // wendu=0;
+     // shidu="0%";
+     // pm25=0;
+     // quality="无数据";
+
+     // type="多云";
+     // fl="2级";
+     // fx="南风";
+
+     // high=30;
+     // low=18;
+     mToday.ganmao=objData.value("ganmao").toString();
+     mToday.wendu=objData.value("wendu").toInt();
+     mToday.shidu=objData.value("shidu").toString();
+     mToday.pm25=objData.value("pm25").toInt();
+     mToday.quality=objData.value("quality").toString();
+     mToday.type=mDay[1].type;
+     mToday.fl=mDay[1].fl;
+     mToday.fx=mDay[1].fx;
+     mToday.high=mDay[1].high;
+     mToday.low=mDay[1].low;
 
 }
+
 
 void MainWindow::onReplied(QNetworkReply *reply)
 {
