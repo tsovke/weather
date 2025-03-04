@@ -1,0 +1,5 @@
+#ifndef WEATHERTOOL_H
+#define WEATHERTOOL_H
+
+
+#endif // WEATHERTOOL_H
