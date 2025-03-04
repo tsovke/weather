@@ -99,9 +99,8 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 void MainWindow::getWeatherInfo(QString cityCode)
 {
     // QUrl url("http://t.weather.itboy.net/api/weather/city/"+cityCode);
-    qDebug()<<cityCode;
     QUrl url("https://www.ithome.com/");
-
+qDebug()<<cityCode;
     mNetAccessManager->get(QNetworkRequest(url));
 }
 
@@ -143,6 +142,7 @@ void MainWindow::parseJson(QByteArray &responseData)
     //污染指数
      mDay[0].aqi=objYersterday.value("aqi").toInt();
 
+
     //3. 解析forecast中5天的数据
      QJsonArray forecastArr=objData.value("forecast").toArray();
 
@@ -170,32 +170,80 @@ void MainWindow::parseJson(QByteArray &responseData)
      }
 
     //4. 解析今天的数据
-     // ganmao="感冒指数";
-
-     // wendu=0;
-     // shidu="0%";
-     // pm25=0;
-     // quality="无数据";
-
-     // type="多云";
-     // fl="2级";
-     // fx="南风";
-
-     // high=30;
-     // low=18;
      mToday.ganmao=objData.value("ganmao").toString();
      mToday.wendu=objData.value("wendu").toInt();
      mToday.shidu=objData.value("shidu").toString();
      mToday.pm25=objData.value("pm25").toInt();
      mToday.quality=objData.value("quality").toString();
+     //5. 今天的其它数据在mDay[1]中
      mToday.type=mDay[1].type;
      mToday.fl=mDay[1].fl;
      mToday.fx=mDay[1].fx;
      mToday.high=mDay[1].high;
      mToday.low=mDay[1].low;
 
+    //6. 更新UI
+     updateUI();
 }
 
+void MainWindow::updateUI() {
+    //1. 更新日期和城市
+    ui->lblDate->setText(QDateTime::fromString(mToday.date, "yyyyMMdd").toString("yyyy/MM/dd") + " "
+                         + mDay[1].week);
+    ui->lblCity->setText(mToday.city);
+
+    //2. 更新今天数据
+    ui->lblTemp->setText(QString::number(mToday.wendu));
+    ui->lblType->setText(mToday.type);
+    ui->lblLowHigh->setText(QString::number(mToday.low)+"~"+QString::number(mToday.high)+"℃");
+
+    ui->lblGanmao->setText(mToday.ganmao);
+    ui->lblWindFx->setText(mToday.fx);
+    ui->lblWindFl->setText(mToday.fl);
+
+    ui->lblPM25->setText(QString::number(mToday.pm25));
+    ui->lblShidu->setText(mToday.shidu);
+    ui->lblQuality->setText(mToday.quality);
+
+    //3. 更新6天数据
+    for (int i = 0; i < 6; ++i) {
+        //3.1 更新日期和时间
+        mWeekList[i]->setText("周"+mDay[i].week.right(1));
+        QStringList ymdList=mDay[i].date.split("-");
+        mDateList[i]->setText(ymdList[1]+"/"+ymdList[2]);
+
+        //3.2 更新天气类型
+        mTypeList[i]->setText(mDay[i].type);
+
+        //3.3 更新空气质量
+        if (mDay[i].aqi >= 0 && mDay[i].aqi <= 50) {
+            mAqiList[i]->setText("优");
+            mAqiList[i]->setStyleSheet("background-color: rgb(121,184,0);");
+        } else if (mDay[i].aqi >50 && mDay[i].aqi <= 100) {
+            mAqiList[i]->setText("良");
+            mAqiList[i]->setStyleSheet("background-color: rgb(255,187,23);");
+        } else if (mDay[i].aqi > 100 && mDay[i].aqi <= 150) {
+            mAqiList[i]->setText("轻度");
+            mAqiList[i]->setStyleSheet("background-color: rgb(255,87,97);");
+        } else if (mDay[i].aqi >150 && mDay[i].aqi <= 200) {
+            mAqiList[i]->setText("中度");
+            mAqiList[i]->setStyleSheet("background-color: rgb(235,17,27);");
+        } else if (mDay[i].aqi > 200 && mDay[i].aqi <= 250) {
+            mAqiList[i]->setText("重度");
+            mAqiList[i]->setStyleSheet("background-color: rgb(170,0,0);");
+        }  else {
+            mAqiList[i]->setText("严重");
+            mAqiList[i]->setStyleSheet("background-color: rgb(110,0,0);");
+        }
+    }
+    // 日期习惯
+    ui->lblWeek0->setText("昨天");
+    ui->lblWeek1->setText("今天");
+    ui->lblWeek2->setText("明天");
+
+
+
+}
 
 void MainWindow::onReplied(QNetworkReply *reply)
 {

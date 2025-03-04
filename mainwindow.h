@@ -35,10 +35,10 @@ protected:
     void mouseMoveEvent(QMouseEvent *event)override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 
-    //获取天气数据
+    //获取天气数据,解析JSON,更新UI
     void getWeatherInfo(QString cityCode);
-
     void parseJson(QByteArray &responseData);
+    void updateUI();
 
 private:
     void onReplied(QNetworkReply *reply);
