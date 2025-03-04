@@ -84,6 +84,20 @@ void MainWindow::getWeatherInfo(QString cityCode)
 
 void MainWindow::parseJson(QByteArray &responseData)
 {
+    QJsonParseError err;
+    QJsonDocument doc=QJsonDocument::fromJson(responseData,&err);
+    if(err.error!=QJsonParseError::NoError){
+        return;
+    }
+
+    QJsonObject rootObj=doc.object();
+    qDebug()<<rootObj.value("message").toString();
+
+   //1. 解析日期和城市
+    mToday.date=rootObj.value("date").toString();
+    mToday.city= rootObj.value("cityInfo").toObject().value("city").toString();
+
+
 
 }
 
