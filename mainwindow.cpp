@@ -251,11 +251,11 @@ void MainWindow::updateUI()
 
     //2. 更新今天数据
     ui->lblTypeIcon->setPixmap(mTypeMap[mToday.type]);
-    ui->lblTemp->setText(QString::number(mToday.wendu)+"℃");
+    ui->lblTemp->setText(QString::number(mToday.wendu) + "℃");
     ui->lblType->setText(mToday.type);
     ui->lblLowHigh->setText(QString::number(mToday.low) + "~" + QString::number(mToday.high) + "℃");
 
-    ui->lblGanmao->setText("感冒指数："+mToday.ganmao);
+    ui->lblGanmao->setText("感冒指数：" + mToday.ganmao);
     ui->lblWindFx->setText(mToday.fx);
     ui->lblWindFl->setText(mToday.fl);
 
@@ -303,7 +303,6 @@ void MainWindow::updateUI()
     ui->lblWeek0->setText("昨天");
     ui->lblWeek1->setText("今天");
     ui->lblWeek2->setText("明天");
-
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
