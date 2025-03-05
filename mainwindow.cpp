@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "weathertool.h"
 #include <QDebug>
 #include <QMessageBox>
 
@@ -88,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
     // 网络请求
     connect(mNetAccessManager,&QNetworkAccessManager::finished,this,&MainWindow::onReplied);
 
-    getWeatherInfo("101010100");
+    getWeatherInfo("深圳");
 
 
 }
@@ -133,11 +134,16 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void MainWindow::getWeatherInfo(QString cityCode)
+void MainWindow::getWeatherInfo(QString cityName)
 {
-    //QUrl url("http://t.weather.itboy.net/api/weather/city/"+cityCode);
-    QUrl url("https://www.ithome.com/");
-qDebug()<<cityCode;
+    QString cityCode=WeatherTool::getCityCode(cityName);
+    if (cityCode.isEmpty()){
+        QMessageBox::warning(this,"天气","请检查输入是否正确！",QMessageBox::Button::Ok);
+            return;
+}
+
+
+    QUrl url("http://t.weather.itboy.net/api/weather/city/"+cityCode);
     mNetAccessManager->get(QNetworkRequest(url));
 }
 
@@ -318,4 +324,7 @@ void MainWindow::onReplied(QNetworkReply *reply)
     reply->deleteLater(); // 确保释放资源
 }
 
-
+void MainWindow::on_btnSearch_clicked() {
+    QString cityName=ui->leCity->text();
+    getWeatherInfo(cityName);
+}
