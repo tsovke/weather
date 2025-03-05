@@ -40,6 +40,13 @@ protected:
     void parseJson(QByteArray &responseData);
     void updateUI();
 
+    //重写父类的eventfilter方法
+    bool eventFilter(QObject* watched,QEvent *event)override;
+
+    //绘制高温低温曲线
+    void paintHighCurve();
+    void paintLowCurve();
+
 private slots:
     void on_btnSearch_clicked();
 
