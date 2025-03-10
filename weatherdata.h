@@ -25,7 +25,7 @@ public:
         high = 30;
         low = 18;
     }
-
+public:
     QString date;
     QString city;
 
@@ -59,6 +59,7 @@ public:
         low = 10;
         aqi = 0;
     }
+public:
     QString date;
     QString week;
 

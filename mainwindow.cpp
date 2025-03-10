@@ -6,6 +6,7 @@
 
 #include <QPainter>
 
+
 //单位温度y坐标增量
 #define INCREMENT 3
 //曲线描点大小
@@ -223,7 +224,12 @@ void MainWindow::parseJson(QByteArray &responseData)
 
     //4. 解析今天的数据
     mToday.ganmao = objData.value("ganmao").toString();
-    mToday.wendu = objData.value("wendu").toInt();
+
+    //！！！注意网站解析的温度19.4无法直接转换成数字
+    QString tempStr=objData.value("wendu").toString();
+    double tempDbl=tempStr.toDouble();
+    mToday.wendu=qRound(tempDbl);
+
     mToday.shidu = objData.value("shidu").toString();
     mToday.pm25 = objData.value("pm25").toInt();
     mToday.quality = objData.value("quality").toString();
